@@ -20,10 +20,14 @@ function showfulldate() {
 function getday() {
     var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
     var oneWeek = 7*24*60*60*1000;
-    var stda = "9/9/2013";
+    var stda = "7/19/2013";
     var firstDate = new Date(stda);
     var count = firstDate;
     var today = new Date();
+    today.setHours("0")
+    today.setMilliseconds("0")
+    today.setMinutes("0")
+    today.setSeconds("0")
     var diffWeek = Math.floor(Math.abs((today.getTime() - firstDate.getTime())/(oneWeek)))+1;
     for(var i=0; count<today;) {
       if(count.getDay()<5)
