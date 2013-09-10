@@ -62,7 +62,7 @@
 	    <input type="date" name="cycle_end" id="cycle_end" value=""  />
          </li>
 	 	
-        <li><div><a data-role="button" href="#" onClick="days_cycle_save()">Save</a></div></li>
+        <li><div><a data-role="button" href="#">Save</a></div></li>
       </ul>
       <ul data-role="listview" data-inset="true" id="daylist">
         <li><a href="#">Day 1</a></li>
@@ -118,6 +118,11 @@
 $(document).ready(function(e) {
     load();    
 });
+function load(){
+	showfulldate();
+	getday()
+	};
+
 </script>
 </body>
 </html>

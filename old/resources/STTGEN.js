@@ -1,9 +1,3 @@
-function load(){
-	opendb();
-	showfulldate();
-	getday();
-	loadsettings();
-	};
 function showfulldate() {  
   Date.prototype.monthNames = [
     "January", "February", "March",
@@ -44,83 +38,52 @@ function getday() {
     $("#day").text("Day "+day);
     $("#week").text("Week "+diffWeek);
 }
-function loadsettings(){
-	db.transaction(function(tx){	
-	  tx.executeSql("SELECT * FROM SETTINGS", [], function (tx, results) {
-		  var el = $("#DPC");
-		  for(var i = 0; i< results.rows.length; i++){
-			  var item = results.rows.item(i);			  
-			  switch (item.type){
-				  case "daysnum":
-				  	el.find("#daysint").val(item.value);
-				  	break;
-				  case "cstart":
-				  	el.find("#cycle_start").val(item.value);
-				  	break;
-				  case "cend":
-				  	el.find("#cycle_end").val(item.value);
-				  	break;
-				  }
-		  }
-		  });
-	});
-	}
 function days_cycle_save(){
 	var el = $("#DPC");
 	var days_number = el.find("#daysint").val();
 	var cycle_start = el.find("#cycle_start").val();
 	var cycle_end = el.find("#cycle_end").val();
-	cycle_settings_db(days_number,cycle_start,cycle_end);
-	db.transaction(function(tx){	
-	  tx.executeSql("SELECT * FROM DAYS", [], function (tx, results) {
-			  for(var i = 1; i<= days_number; i++){
-				  var day = "";
-				  try {day = results.rows.item(i-1);}catch (ex) {};
-				  if(day == ""){
-					  var display = "Day " + i;
-					  var periods = "";
-					  days_create_db(i,display,periods);
-					  day={
-						  id:i, display:display, periods:periods
-						  };
-					  days_cycle_ui_add(day);		
-					  }
-				  else{
-					  days_cycle_ui_add(day);
-				  }				
-				  }
-		  });
-	},errorCB);
+	cycle_settings_db(days_number,cycle_start,cycle_end);	
+	tx.executeSql("SELECT * FROM DAYS", [], function (tx, results) {
+			for(var i = 1; i<= days_number; i++){
+				var day;
+				try {day = results.rows.item(i);}catch (ex) {};
+				if(!day){
+					var display = "Day " + i;
+					var periods = {};
+					days_create_db(i,display,periods);
+					day={
+						id:i, displaay:display, periods:periods
+						};
+					days_cycle_ui_add(day);		
+					}
+				else{
+					days_cycle_ui_add(day);
+				}				
+				}
+		});	
 	}
 function days_cycle_ui_add(day){
-	var el = $("#DPC").find("#daylist");
-	var dayel = $('<li><a></a></li>');
-	dayel.find("a").attr("data-id",day.id);
-	dayel.find("a").attr("onClick","pageedit_show(attributes[0].value)");
-	dayel.find("a").text(day.display);
+	var el = $("#DPC").find("#dayslist");
+	var dayel = $('<li><a onClick="pageedit_show(data-id)" data-id="'+day.id+'"></a></li>');
 	el.append(dayel);
 	el.listview("refresh");
 	}
 function pageedit_show(pageid){
-	pageid = Number(pageid);
-	db.transaction(function(tx){
-	  tx.executeSql("SELECT * FROM DAYS WHERE id=?", [pageid], function (tx, results) {
-		  var day = results.rows.item(0);
-		  var el = $("#pageedit");
-		  for(var i = 1; i <= day.periods.length; i++){
-			  var id = day.periods[i];
-			  
-			  }
-		  });
-		},errorCB);
+	tx.executeSql("SELECT * FROM PAGES WHERE id=?", [pageid], function (tx, results) {
+		var day = results.rows.item(0);
+		var el = $("#pageedit");
+		for(var i = 1; i <= day.periods.length; i++){
+			var id = day.periods[i];
+			
+			}
+		});
 	}
 function periods_create(periodid){
-	db.transaction(function(tx){	
 	tx.executeSql("SELECT * FROM PERIODS WHERE id=?", [periodid], function (tx, results) {
 		var period = results.rows.item(0);
 		periods_create_ui(period);
 		});
-	},errorCB);
 	}
 function periods_create_ui(item){
 	var el = $("#pageedit").find("#pagehost");

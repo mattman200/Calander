@@ -1,4 +1,4 @@
-var db;
+var db
 function errorCB(err) {
     alert("Error processing SQL: " + err.code);
 }//db.transaction(function(tx){},errorCB);
@@ -12,13 +12,13 @@ function opendb(){
 }
 function cycle_settings_db(daysnum,cstart,cend){
 	db.transaction(function(tx){
-		tx.executeSql('IF EXISTS (SELECT * FROM SETTINGS WHERE id=?) UPDATE SETTINGS SET type=?,value=? WHERE id=? ELSE INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [1,"daysnum",daysnum,1,1, "daysnum",daysnum]);
-		tx.executeSql('IF EXISTS (SELECT * FROM SETTINGS WHERE id=?) UPDATE SETTINGS SET type=?,value=? WHERE id=? ELSE INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [2,"cstart",cstart,2,2,"cstart",cstart]);
-		tx.executeSql('IF EXISTS (SELECT * FROM SETTINGS WHERE id=?) UPDATE SETTINGS SET type=?,value=? WHERE id=? ELSE INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [3,"cend",cend,3,3,"cend",cend]);		
+		tx.executeSql('INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [1, "daysnum",daysnum]);
+		tx.executeSql('INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [2, "cstart",cstart]);
+		tx.executeSql('INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [3, "cend",cend]);		
 		},errorCB);
 	}
 function days_create_db(id,display,periods){
 	db.transaction(function(tx){
-		tx.executeSql('INSERT INTO DAYS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
+		tx.executeSql('INSERT INTO SETTINGS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
 		},errorCB);
 	}
