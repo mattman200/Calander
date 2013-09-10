@@ -23,8 +23,7 @@ function getday() {
     var stda = "9/9/2013";
     var firstDate = new Date(stda);
     var count = firstDate;
-    var today = new Date("9/16/2013");
-    var diffDays = Math.floor(Math.abs((firstDate.getTime() - today.getTime())/(oneDay)));
+    var today = new Date();
     var diffWeek = Math.floor(Math.abs((today.getTime() - firstDate.getTime())/(oneWeek)))+1;
     for(var i=0; count<today;) {
       if(count.getDay()<5)
