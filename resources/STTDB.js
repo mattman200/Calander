@@ -1,4 +1,4 @@
-var db;
+    var db;
 function errorCB(err) {
     alert("Error processing SQL: " + err.code);
 }//db.transaction(function(tx){},errorCB);
@@ -7,7 +7,7 @@ function opendb(){
 	db.transaction(function (tx) {
         tx.executeSql('CREATE TABLE IF NOT EXISTS DAYS (id INTEGER PRIMARY KEY AUTOINCREMENT , display, periods)');
         tx.executeSql('CREATE TABLE IF NOT EXISTS PERIODS (id INTEGER PRIMARY KEY AUTOINCREMENT, title, tstart, tend, loc, more)');
-		tx.executeSql('CREATE TABLE IF NOT EXISTS SETTINGS (id INTEGER PRIMARY KEY AUTOINCREMENT, type, value)');        
+	tx.executeSql('CREATE TABLE IF NOT EXISTS SETTINGS (id INTEGER PRIMARY KEY AUTOINCREMENT, type, value)');        
     }, errorCB);	
 }
 function cycle_settings_db(daysnum,cstart,cend){
@@ -19,6 +19,7 @@ function cycle_settings_db(daysnum,cstart,cend){
 	}
 function days_create_db(id,display,periods){
 	db.transaction(function(tx){
-		tx.executeSql('INSERT INTO DAYS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
+		tx.executeSql('DELETE FROM DAYS;');
+		//tx.executeSql('INSERT INTO DAYS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
 		},errorCB);
 	}
