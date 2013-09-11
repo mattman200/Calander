@@ -19,7 +19,6 @@ function cycle_settings_db(daysnum,cstart,cend){
 	}
 function days_create_db(id,display,periods){
 	db.transaction(function(tx){
-		tx.executeSql('DELETE FROM DAYS;');
-		//tx.executeSql('INSERT INTO DAYS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
+		tx.executeSql('INSERT INTO DAYS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
 		},errorCB);
 	}

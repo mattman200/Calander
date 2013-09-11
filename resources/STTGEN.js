@@ -20,7 +20,7 @@ function showfulldate() {
 		return days[today.getDay()]
 	};
 	var d = new Date()  
-  	var fulldate = d.getDayName()+", "+ d.getDay()+" "+ d.getMonthName()+" "+ d.getFullYear();
+  	var fulldate = d.getDayName()+", "+ d.getDate()+" "+ d.getMonthName()+" "+ d.getFullYear();
   $("#fulldate").text(fulldate);
 }
 function getday() {
@@ -67,11 +67,15 @@ function loadsettings(){
 	}
 function days_cycle_save(){
 	var el = $("#DPC");
+	var elr = $("#DPC").find("#daylist");
+	elr.text("");
 	var days_number = el.find("#daysint").val();
 	var cycle_start = el.find("#cycle_start").val();
 	var cycle_end = el.find("#cycle_end").val();
 	cycle_settings_db(days_number,cycle_start,cycle_end);
-	db.transaction(function(tx){	
+	db.transaction(function(tx){
+	  tx.executeSql('DELETE FROM DAYS');
+	  tx.executeSql('DELETE FROM PERIODS');
 	  tx.executeSql("SELECT * FROM DAYS", [], function (tx, results) {
 			  for(var i = 1; i<= days_number; i++){
 				  var day = "";
