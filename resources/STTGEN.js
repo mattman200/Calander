@@ -1,8 +1,9 @@
 function load(){
 	opendb();
-	showfulldate();
-	getday();
 	loadsettings();
+	loaddays();
+	showfulldate();
+	getday();	
 	};
 function showfulldate() {  
   Date.prototype.monthNames = [
@@ -65,6 +66,17 @@ function loadsettings(){
 		  });
 	});
 	}
+function loaddays(){
+		db.transaction(function(tx){	
+		tx.executeSql("SELECT * FROM DAYS", [], function (tx, results) {
+			var el = $("#DPC");
+			for(var i = 0; i< results.rows.length; i++){
+				var item = results.rows.item(i);			  
+				days_cycle_ui_add(item);
+			}
+			});
+	  });
+	 }
 function days_cycle_save(){
 	var el = $("#DPC");
 	var elr = $("#DPC").find("#daylist");
@@ -103,18 +115,25 @@ function days_cycle_ui_add(day){
 	dayel.find("a").attr("onClick","pageedit_show(attributes[0].value)");
 	dayel.find("a").text(day.display);
 	el.append(dayel);
-	el.listview("refresh");
+	if (el.hasClass('ui-listview')) {
+        	el.listview('refresh');
+		}
 	}
 function pageedit_show(pageid){
 	pageid = Number(pageid);
+	var el = $("#pageedit").find("#pagehost").text("");
 	db.transaction(function(tx){
 	  tx.executeSql("SELECT * FROM DAYS WHERE id=?", [pageid], function (tx, results) {
 		  var day = results.rows.item(0);
+		  var periods = day.periods.split(",");
 		  var el = $("#pageedit");
-		  for(var i = 1; i <= day.periods.length; i++){
-			  var id = day.periods[i];
-			  
+		  for(var i = 1; i <= periods.length; i++){
+			  if(!periods[i] == ""){
+				var id = Number(periods[i]);
+				periods_create(id);
 			  }
+		  }
+			$.mobile.changePage("#pageedit");
 		  });
 		},errorCB);
 	}
@@ -135,7 +154,7 @@ function periods_create_ui(item){
             <label for="title">Title (Subject)</label>\
             <input type="text" name="title" id="title"/>\
             <br>\
-            <label for="cycle_start">Time Start</label>\
+            <label for="time_start">Time Start</label>\
             <input type="time" name="time_start" id="time_start" value="" data-mini="true" data-inline="true" />\
             <label for="time_end">Time End</label>\
             <input type="time" name="time_end" id="time_end" value="" data-mini="true" data-inline="true" />\
@@ -143,18 +162,18 @@ function periods_create_ui(item){
             <label for="loc">Location</label>\
             <input type="text" name="loc" id="loc" value="" />\
             <label for="more">More Info</label>\
-            <input type="text" name="more" id="more" value="" />\
+            <textarea type="text" name="more" id="more" value=""></textarea>\
          </li>\
         <li><div><a data-role="button" href="#">Save</a></div></li>\
       </ul>\
 	  ');
 	if(!item){
-		var id;
-		var title = "Example";
+		var id = new Date().getTime();
+		var title = "Example Period";
 		var tstart = "12:00";
 		var tend = "13:00";
 		var loc = "Room: 1206";
-		var more = "This is a place where more information can go.";
+		var more = "Place more information here.";
 		item = {id:id, title:title, tstart:tstart, tend:tend, loc:loc, more:more}
 		}
 	else{
@@ -165,8 +184,14 @@ function periods_create_ui(item){
 		periodel.find("#title").val(item.title);
 		periodel.find("#time_start").val(item.tstart);
 		periodel.find("#time_end").val(item.tend);
-		periodel.find("#loa").val(item.loc);
-		periodel.find("#more").val(item.more);
-		hostel.append(periodel);
+		periodel.find("#loc").val(item.loc);
+		periodel.find("#more").attr("placeholder",item.more);			
+		hostel.append(periodel);		
 		el.append(hostel);
+		el.find("ul").trigger('create');		
+		el.find("ul").listview()
+		el.find("ul").listview('refresh');		
+		if (el.hasClass('ui-collapsible-set')) {
+        	el.collapsibleset('refresh');
+		}		
 	}

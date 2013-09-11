@@ -1,4 +1,4 @@
-    var db;
+var db;
 function errorCB(err) {
     alert("Error processing SQL: " + err.code);
 }//db.transaction(function(tx){},errorCB);
