@@ -10,11 +10,10 @@ function opendb(){
 	tx.executeSql('CREATE TABLE IF NOT EXISTS SETTINGS (id INTEGER PRIMARY KEY AUTOINCREMENT, type, value)');        
     }, errorCB);	
 }
-function cycle_settings_db(daysnum,cstart,cend){
+function cycle_settings_db(daysnum,cstart){
 	db.transaction(function(tx){
 		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [1,"daysnum",daysnum]);
-		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [2,"cstart",cstart]);
-		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [3,"cend",cend]);		
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [2,"cstart",cstart]);				
 		},errorCB);
 	}
 function days_create_db(id,display,periods){
@@ -35,5 +34,20 @@ function period_add_db(id,title,tstart,tend,loc,more){
 function period_remove_db(id){
 	db.transaction(function(tx){
 		tx.executeSql('DELETE FROM PERIODS WHERE id=?', [id]);
+		},errorCB);
+	}
+function cycle_occure_save_db(value){
+	db.transaction(function(tx){
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [4,"occure",value]);
+		},errorCB);
+	}
+function lastdaycheck_save(value){
+	db.transaction(function(tx){
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [5,"lastday",value]);
+		},errorCB);
+	}
+function lastdatecheck_save(value){
+	db.transaction(function(tx){
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [6,"lastdate",value]);
 		},errorCB);
 	}
