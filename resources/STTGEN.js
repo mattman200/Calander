@@ -122,12 +122,13 @@ function days_cycle_ui_add(day){
 function pageedit_show(pageid){
 	pageid = Number(pageid);
 	var el = $("#pageedit").find("#pagehost").text("");
+	$("#pageedit").attr("data-id",pageid);
 	db.transaction(function(tx){
 	  tx.executeSql("SELECT * FROM DAYS WHERE id=?", [pageid], function (tx, results) {
 		  var day = results.rows.item(0);
 		  var periods = day.periods.split(",");
 		  var el = $("#pageedit");
-		  for(var i = 1; i <= periods.length; i++){
+		  for(var i = 0; i <= periods.length; i++){
 			  if(!periods[i] == ""){
 				var id = Number(periods[i]);
 				periods_create(id);
@@ -162,9 +163,9 @@ function periods_create_ui(item){
             <label for="loc">Location</label>\
             <input type="text" name="loc" id="loc" value="" />\
             <label for="more">More Info</label>\
-            <textarea type="text" name="more" id="more" value=""></textarea>\
+            <textarea type="text" name="more" id="more" value="" placeholder="Place more information here."></textarea>\
          </li>\
-        <li><div><a data-role="button" href="#">Save</a></div></li>\
+        <li><div><a data-role="button" href="#" data-theme="f" id="remove" onClick="daysedit_periods_remove(attributes[5].value)">Remove</a></div></li>\
       </ul>\
 	  ');
 	if(!item){
@@ -173,7 +174,7 @@ function periods_create_ui(item){
 		var tstart = "12:00";
 		var tend = "13:00";
 		var loc = "Room: 1206";
-		var more = "Place more information here.";
+		var more = "";
 		item = {id:id, title:title, tstart:tstart, tend:tend, loc:loc, more:more}
 		}
 	else{
@@ -185,13 +186,70 @@ function periods_create_ui(item){
 		periodel.find("#time_start").val(item.tstart);
 		periodel.find("#time_end").val(item.tend);
 		periodel.find("#loc").val(item.loc);
-		periodel.find("#more").attr("placeholder",item.more);			
+		periodel.find("#more").val(item.more);
+		periodel.find("#remove").attr("data-id",item.id);			
 		hostel.append(periodel);		
 		el.append(hostel);
-		el.find("ul").trigger('create');		
+		el.find("ul").trigger('create');				
 		el.find("ul").listview()
 		el.find("ul").listview('refresh');		
 		if (el.hasClass('ui-collapsible-set')) {
         	el.collapsibleset('refresh');
-		}		
+		}
+		
+	}
+	
+function dayedit_save(){
+	var page = $("#pageedit");
+	var periodshost = page.find("#pagehost");
+	var periods = periodshost.find('[data-role="collapsible"]');
+	var pageid = Number(page.attr("data-id"));
+	var listofids = "";
+	for(var i = 0; i < periods.length; i++){
+		period = $(periods[i]);
+		periodid = Number(period.attr("data-id"));
+		var item = {};
+		item.title = period.find("#title").val();
+		item.tstart = period.find("#time_start").val();
+		item.tend = period.find("#time_end").val();
+		item.loc = period.find("#loc").val();
+		item.more = period.find("#more").val();
+		period_add_db(periodid,item.title,item.tstart,item.tend,item.loc,item.more);
+		listofids = listofids +periodid+",";
+		}
+		listofids = listofids.slice(0,-1);
+		days_update_periods(pageid,listofids);
+		$.mobile.changePage("#setup");
+	}
+function daysedit_periods_remove(id){
+	var page = $("#pageedit");
+	var pageid = Number(page.attr("data-id"));
+	var periodshost = page.find("#pagehost");
+	var period = periodshost.find('.ui-collapsible[data-id="'+id+'"]');
+	period_remove_db(Number(id));
+	
+	db.transaction(function(tx){
+	  tx.executeSql("SELECT * FROM DAYS WHERE id=?", [pageid], function (tx, results) {
+		  var day = results.rows.item(0);
+		  var periods = day.periods.split(",");
+		  for(var i = 0; i<periods.length; i++){
+			  if (periods[i] == id){
+				  periods[i] = "";
+				  }
+			  }
+			var periods2 = "";
+		   for(var i = 0; i<periods.length; i++){
+			  if (!periods[i] == ""){
+				  periods2 = periods2 + periods[i] +",";
+				  }
+			  }
+			 periods2 = periods2.slice(0,-1);
+			 days_update_periods(pageid,periods2);
+		  });
+	});
+	
+	period.remove();	
+	if (periodshost.hasClass('ui-collapsible-set')) {
+        	periodshost.collapsibleset('refresh');
+		}	
 	}

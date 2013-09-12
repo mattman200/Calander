@@ -12,13 +12,28 @@ function opendb(){
 }
 function cycle_settings_db(daysnum,cstart,cend){
 	db.transaction(function(tx){
-		tx.executeSql('IF EXISTS (SELECT * FROM SETTINGS WHERE id=?) UPDATE SETTINGS SET type=?,value=? WHERE id=? ELSE INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [1,"daysnum",daysnum,1,1, "daysnum",daysnum]);
-		tx.executeSql('IF EXISTS (SELECT * FROM SETTINGS WHERE id=?) UPDATE SETTINGS SET type=?,value=? WHERE id=? ELSE INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [2,"cstart",cstart,2,2,"cstart",cstart]);
-		tx.executeSql('IF EXISTS (SELECT * FROM SETTINGS WHERE id=?) UPDATE SETTINGS SET type=?,value=? WHERE id=? ELSE INSERT INTO SETTINGS (id,type,value) VALUES (?,?,?)', [3,"cend",cend,3,3,"cend",cend]);		
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [1,"daysnum",daysnum]);
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [2,"cstart",cstart]);
+		tx.executeSql('INSERT OR REPLACE INTO SETTINGS (id,type,value) VALUES (?,?,?)', [3,"cend",cend]);		
 		},errorCB);
 	}
 function days_create_db(id,display,periods){
 	db.transaction(function(tx){
 		tx.executeSql('INSERT INTO DAYS (id,display,periods) VALUES (?,?,?)', [id, display, periods]);
+		},errorCB);
+	}
+function days_update_periods(id,periods){
+	db.transaction(function(tx){
+		tx.executeSql('UPDATE DAYS SET periods=? WHERE id=? ', [periods, id]);
+		},errorCB);
+	}
+function period_add_db(id,title,tstart,tend,loc,more){
+	db.transaction(function(tx){
+		tx.executeSql('INSERT OR REPLACE INTO PERIODS (id,title,tstart,tend,loc,more) VALUES (?,?,?,?,?,?)', [id,title,tstart,tend,loc,more]);
+		},errorCB);
+	}
+function period_remove_db(id){
+	db.transaction(function(tx){
+		tx.executeSql('DELETE FROM PERIODS WHERE id=?', [id]);
 		},errorCB);
 	}
